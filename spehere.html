@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewSphere — AI-Powered Interview Preparation</title>
+<style>
+:root {
+  --bg: #f5f3ee;
+  --bg-alt: #faf9f6;
+  --sidebar-bg: #1a1a2e;
+  --sidebar-w: 220px;
+  --card: #ffffff;
+  --border: #e8e4dc;
+  --accent: #3d9970;
+  --accent-h: #2e7d57;
+  --accent-l: #e8f5ee;
+  --blue: #4361ee;
+  --blue-l: #eef0fd;
+  --red: #e63946;
+  --red-l: #fdecea;
+  --amber: #f4a261;
+  --amber-l: #fef3e8;
+  --text: #1a1a2e;
+  --text-s: #5a5a7a;
+  --text-m: #9999bb;
+  --s-text: #b8b8d4;
+  --s-active: #ffffff;
+  --shadow: 0 1px 4px rgba(26,26,46,.08);
+  --shadow-m: 0 4px 16px rgba(26,26,46,.12);
+  --shadow-l: 0 8px 32px rgba(26,26,46,.16);
+  --r: 12px; --rs: 8px;
+  --font: 'Segoe UI',Arial,sans-serif;
+  --font-h: Georgia,serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;min-height:100vh}
+h1,h2,h3,h4{font-family:var(--font-h)}
+a{color:var(--accent);text-decoration:none}
+.hidden{display:none!important}
+
+/* ── APP SHELL ── */
+.app-shell{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);background:var(--sidebar-bg);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:200;
+}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo-name{font-family:var(--font-h);font-size:19px;font-weight:700;color:#fff}
+.sb-logo-sub{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-m);margin-top:2px}
+.sb-section{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-m);padding:18px 20px 7px}
+.sb-nav{padding:0 10px}
+.sb-link{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:var(--rs);color:var(--s-text);font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .18s;border:none;background:none;
+  width:100%;text-align:left;margin-bottom:2px;font-family:var(--font);
+}
+.sb-link:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-link.active{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
+.sb-link .ico{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sb-spacer{flex:1}
+.sb-bottom-section{padding:0 10px 10px}
+.sb-logout-btn{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:var(--rs);color:#f87171;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .18s;border:1px solid rgba(248,113,113,.2);background:rgba(248,113,113,.05);
+  width:100%;text-align:left;margin-bottom:2px;font-family:var(--font);
+}
+.sb-logout-btn:hover{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);color:#fca5a5}
+.sb-logout-btn .ico{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sb-user{
+  padding:13px 15px;border-top:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;gap:10px;
+}
+.sb-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;flex-shrink:0;
+  box-shadow:0 0 0 2.5px rgba(61,153,112,.45);
+}
+.sb-uname{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-size:11px;color:var(--s-text)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOP BAR */
+.topbar{
+  background:var(--bg-alt);border-bottom:1px solid var(--border);
+  padding:0 30px;height:54px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;
+}
+.tb-crumb{font-size:13px;color:var(--text-m)}
+.tb-crumb span{color:var(--text);font-weight:600}
+.btn-new{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--sidebar-bg);color:#fff;border:none;
+  border-radius:var(--rs);padding:8px 16px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:var(--font);transition:background .2s;
+}
+.btn-new:hover{background:#2a2a45}
+
+/* PAGE CONTENT */
+.pc{padding:28px 30px;flex:1}
+
+/* PAGES — app pages inside shell */
+.pg{display:none}
+.pg.active{display:block}
+
+/* FULLSCREEN pages (landing / signup) */
+.pgf{position:fixed;inset:0;z-index:300;display:none}
+.pgf.active{display:flex}
+
+/* ── LANDING (fullscreen, pre-auth) ── */
+#page-landing{
+  background:var(--sidebar-bg);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px 24px;overflow-y:auto;
+}
+.land-logo{font-family:var(--font-h);font-size:26px;color:#fff;margin-bottom:2px}
+.land-logo span{color:var(--accent)}
+.land-logo-sub{font-size:10px;color:var(--text-m);text-transform:uppercase;letter-spacing:.12em;margin-bottom:52px}
+.land-title{font-family:var(--font-h);font-size:clamp(34px,5vw,62px);color:#fff;line-height:1.1;margin-bottom:18px}
+.land-title span{color:var(--accent)}
+.land-desc{font-size:16px;color:var(--s-text);max-width:500px;margin:0 auto 36px;line-height:1.75}
+.land-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+.btn-lp{background:var(--accent);color:#fff;border:none;padding:13px 30px;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .2s}
+.btn-lp:hover{background:var(--accent-h)}
+.btn-lg2{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);padding:13px 30px;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .2s}
+.btn-lg2:hover{background:rgba(255,255,255,.14)}
+.land-stats{display:flex;gap:36px;justify-content:center;border-top:1px solid rgba(255,255,255,.1);padding-top:36px;flex-wrap:wrap;margin-bottom:70px}
+.ls-val{font-family:var(--font-h);font-size:28px;font-weight:700;color:var(--accent)}
+.ls-lbl{font-size:11px;color:var(--s-text);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.land-feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:860px;margin:0 auto;text-align:left}
+.lf-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:var(--r);padding:22px}
+.lf-icon{font-size:22px;margin-bottom:10px}
+.lf-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:5px}
+.lf-desc{font-size:13px;color:var(--s-text);line-height:1.6}
+
+/* ── SIGN UP ── */
+#page-signup{background:var(--bg);align-items:center;justify-content:center}
+.auth-wrap{width:100%;max-width:430px;padding:20px}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo-name{font-family:var(--font-h);font-size:21px;color:var(--text);font-weight:700}
+.auth-logo-sub{font-size:11px;color:var(--text-m);text-transform:uppercase;letter-spacing:.08em}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:32px;box-shadow:var(--shadow-m)}
+.auth-title{font-size:21px;font-weight:700;color:var(--text);margin-bottom:5px}
+.auth-sub{font-size:13px;color:var(--text-s);margin-bottom:24px}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:15px}
+.fl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-s)}
+.fi,.fs,.ft{
+  background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rs);
+  color:var(--text);font-family:var(--font);font-size:14px;
+  padding:10px 13px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;
+}
+.fi::placeholder,.ft::placeholder{color:var(--text-m)}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(61,153,112,.13);background:#fff}
+.fs{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233d9970' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--bg);padding-right:34px;cursor:pointer}
+.ft{resize:vertical;min-height:140px;line-height:1.6}
+.divider{height:1px;background:var(--border);margin:18px 0}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--rs);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-h);transform:translateY(-1px);box-shadow:0 4px 12px rgba(61,153,112,.28)}
+.btn-secondary{background:var(--sidebar-bg);color:#fff}
+.btn-secondary:hover{background:#2a2a45}
+.btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-ghost{background:var(--bg);color:var(--text-s);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--border);color:var(--text)}
+.btn-sm{padding:7px 13px;font-size:12px}
+.w-full{width:100%}
+
+/* ── HOME PAGE (inside app shell) ── */
+.home-section-hero{
+  background:var(--sidebar-bg);
+  position:relative;overflow:hidden;
+  padding:60px 40px 50px;text-align:center;
+}
+.home-orb{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
+.home-orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(61,153,112,.25),transparent 70%);top:-120px;right:-80px;opacity:.8}
+.home-orb2{width:350px;height:350px;background:radial-gradient(circle,rgba(67,97,238,.18),transparent 70%);bottom:-80px;left:-50px;opacity:.7}
+.home-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(61,153,112,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(61,153,112,.04) 1px,transparent 1px);background-size:50px 50px}
+.home-hero-inner{position:relative;z-index:1;max-width:700px;margin:0 auto}
+.home-hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(61,153,112,.15);border:1px solid rgba(61,153,112,.3);
+  border-radius:20px;padding:6px 16px;font-size:11px;font-weight:700;
+  color:var(--accent);letter-spacing:.09em;text-transform:uppercase;margin-bottom:24px;
+}
+.home-pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:hpulse 2s infinite;flex-shrink:0}
+@keyframes hpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+.home-hero-title{font-family:var(--font-h);font-size:clamp(36px,5vw,64px);color:#fff;line-height:1.08;margin-bottom:18px;font-weight:700}
+.home-accent-text{color:var(--accent)}
+.home-hero-desc{font-size:16px;color:var(--s-text);max-width:560px;margin:0 auto 32px;line-height:1.75}
+.home-hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:50px}
+.home-ghost-btn{
+  background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);
+  padding:13px 30px;border-radius:var(--rs);font-size:15px;font-weight:600;
+  cursor:pointer;font-family:var(--font);transition:background .2s;
+}
+.home-ghost-btn:hover{background:rgba(255,255,255,.14)}
+.home-stats-strip{
+  display:flex;gap:48px;justify-content:center;flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,.1);padding-top:36px;
+}
+.home-stat-item{}
+.home-stat-val{font-family:var(--font-h);font-size:30px;font-weight:700;color:var(--accent);line-height:1}
+.home-stat-lbl{font-size:11px;color:var(--s-text);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+
+/* Sections */
+.home-section{padding:60px 40px}
+.home-section-alt{background:var(--bg-alt);padding:60px 40px}
+.home-section-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.home-section-title{font-family:var(--font-h);font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--text);line-height:1.3;margin-bottom:10px}
+.home-section-sub{font-size:14px;color:var(--text-s);margin-bottom:40px;max-width:560px;line-height:1.7}
+
+/* Features grid - same as 2nd code */
+.home-feats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.home-feat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:28px;
+  box-shadow:var(--shadow);transition:all .25s;
+  position:relative;overflow:hidden;
+}
+.home-feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0;transition:opacity .25s}
+.home-feat-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow-m)}
+.home-feat-card:hover::before{opacity:1}
+.home-feat-icon-box{
+  width:50px;height:50px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:16px;
+  background:var(--accent-l);border:1px solid rgba(61,153,112,.2);
+}
+.home-feat-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.home-feat-desc{font-size:13px;color:var(--text-s);line-height:1.7}
+
+/* Steps grid */
+.home-steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:40px}
+.home-step-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:28px 22px;text-align:center;
+  box-shadow:var(--shadow);transition:all .22s;
+}
+.home-step-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow-m)}
+.home-step-num{font-family:var(--font-h);font-size:44px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:12px}
+.home-step-title{font-family:var(--font-h);font-size:16px;color:var(--text);margin-bottom:7px;font-weight:700}
+.home-step-desc{font-size:13px;color:var(--text-m);line-height:1.6}
+
+/* CTA Banner */
+.home-cta-banner{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:44px 36px;text-align:center;
+  box-shadow:var(--shadow);margin-bottom:28px;
+  position:relative;overflow:hidden;
+}
+.home-cta-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(61,153,112,.06) 0%,transparent 70%)}
+.home-cta-title{font-family:var(--font-h);font-size:26px;font-weight:700;color:var(--text);margin-bottom:10px;position:relative}
+.home-cta-sub{font-size:14px;color:var(--text-s);margin-bottom:22px;position:relative}
+
+/* STAT CARDS ROW */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:15px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow)}
+.sc-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-s);margin-bottom:7px}
+.sc-value{font-family:var(--font-h);font-size:34px;font-weight:700;line-height:1;margin-bottom:5px}
+.sc-value.green{color:var(--accent)}.sc-value.blue{color:var(--blue)}.sc-value.red{color:var(--red)}.sc-value.dark{color:var(--text)}
+.sc-hint{font-size:12px;color:var(--text-m)}
+.sc-hint.up{color:var(--accent)}.sc-hint.dn{color:var(--red)}
+
+/* PAGE HEADER */
+.ph-greeting{font-family:var(--font-h);font-size:25px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ph-sub{font-size:13px;color:var(--text-m);margin-bottom:24px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:15px;font-weight:700;color:var(--text)}
+.card-link{font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;background:none;border:none;font-family:var(--font)}
+.card-link:hover{text-decoration:underline}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.04em}
+.badge-green{background:var(--accent-l);color:var(--accent)}
+.badge-blue{background:var(--blue-l);color:var(--blue)}
+.badge-red{background:var(--red-l);color:var(--red)}
+.badge-amber{background:var(--amber-l);color:#c07030}
+
+/* PROFILE */
+.profile-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:26px;display:flex;align-items:center;gap:22px;margin-bottom:18px;box-shadow:var(--shadow);flex-wrap:wrap}
+.p-avatar{width:70px;height:70px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-h);font-size:26px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 0 4px var(--accent-l)}
+.p-name{font-size:21px;font-weight:700;color:var(--text);margin-bottom:2px}
+.p-email{font-size:13px;color:var(--text-s);margin-bottom:9px}
+.p-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:13px;margin-bottom:22px}
+.p-tile{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:15px}
+.p-tile-l{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-m);margin-bottom:4px}
+.p-tile-v{font-family:var(--font-h);font-size:18px;font-weight:700;color:var(--text)}
+
+/* DASHBOARD CONFIG */
+.cfg-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-m);margin-bottom:9px}
+.option-cards{display:grid;gap:11px;margin-bottom:18px}
+#type-cards{grid-template-columns:1fr 1fr}
+#duration-cards{grid-template-columns:1fr 1fr}
+#questions-cards{grid-template-columns:1fr 1fr 1fr}
+.option-card{background:var(--bg);border:2px solid var(--border);border-radius:var(--r);padding:15px 13px;cursor:pointer;text-align:center;transition:all .18s;user-select:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:92px}
+.option-card:hover,.option-card.selected{border-color:var(--accent);background:var(--accent-l)}
+.oc-icon{font-size:21px;margin-bottom:6px}
+.oc-label{font-size:13px;font-weight:700;color:var(--text)}
+.oc-sub{font-size:11px;color:var(--text-m);margin-top:2px}
+
+/* INTERVIEW */
+.iv-wrap{max-width:740px;margin:0 auto}
+.iv-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.timer{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:9px 16px;font-family:var(--font-h);font-size:23px;font-weight:700;color:var(--text)}
+.timer.warning{border-color:var(--amber);color:var(--amber)}
+.timer.danger{border-color:var(--red);color:var(--red);animation:tp 1s infinite}
+@keyframes tp{0%,100%{opacity:1}50%{opacity:.45}}
+.prog-dots{display:flex;gap:5px;flex-wrap:wrap}
+.pdot{width:9px;height:9px;border-radius:50%;background:var(--border);border:1.5px solid var(--border);transition:all .3s}
+.pdot.done{background:var(--accent);border-color:var(--accent)}
+.pdot.cur{background:var(--blue);border-color:var(--blue);box-shadow:0 0 6px rgba(67,97,238,.4)}
+.pbar-track{height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:22px}
+.pbar-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .6s ease}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:26px;margin-bottom:14px;box-shadow:var(--shadow);animation:fu .35s ease}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.q-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:9px}
+.q-text{font-family:var(--font-h);font-size:18px;color:var(--text);line-height:1.45;margin-bottom:14px}
+.a-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.a-lbl{font-size:12px;font-weight:700;color:var(--text-s);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
+.wch{font-size:12px;color:var(--text-m);margin-top:5px;text-align:right}
+.wch.ok{color:var(--amber)}.wch.good{color:var(--accent)}
+.iv-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:8px}
+
+/* EVALUATION */
+.ev-wrap{max-width:780px;margin:0 auto}
+.score-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:34px 28px;text-align:center;margin-bottom:18px;box-shadow:var(--shadow)}
+.score-ring{width:116px;height:116px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;border:6px solid var(--border);position:relative}
+.score-num{font-family:var(--font-h);font-size:34px;font-weight:700;color:var(--text);line-height:1}
+.score-den{font-size:13px;color:var(--text-m)}
+.score-grade{font-family:var(--font-h);font-size:21px;color:var(--text);margin-bottom:4px}
+.score-sub{font-size:13px;color:var(--text-s)}
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:13px;margin-bottom:18px}
+.bk-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:17px;box-shadow:var(--shadow)}
+.bk-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-s);margin-bottom:5px}
+.bk-score{font-family:var(--font-h);font-size:25px;font-weight:700;color:var(--text);margin-bottom:7px}
+.fb-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:13px}
+.fb-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:17px;box-shadow:var(--shadow)}
+.fb-title{font-size:13px;font-weight:700;margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.fb-item{display:flex;align-items:flex-start;gap:7px;font-size:13px;color:var(--text-s);margin-bottom:7px;line-height:1.55}
+.fb-item::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:1px}
+
+/* ANALYTICS */
+.an-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:18px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.chart-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.trend-wrap{height:140px;position:relative;overflow:hidden}
+.trend-svg{width:100%;height:100%}
+.ht-wrap{overflow-x:auto}
+.ht{width:100%;border-collapse:separate;border-spacing:0 3px}
+.ht th{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-m);padding:7px 13px;text-align:left}
+.ht td{padding:11px 13px;background:var(--bg);font-size:13px;color:var(--text-s);vertical-align:middle}
+.ht tr td:first-child{border-radius:7px 0 0 7px}.ht tr td:last-child{border-radius:0 7px 7px 0}
+.ht tbody tr:hover td{background:var(--accent-l)}
+.sc-chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.sc-chip.high{background:var(--accent-l);color:var(--accent)}.sc-chip.mid{background:var(--amber-l);color:#c07030}.sc-chip.low{background:var(--red-l);color:var(--red)}
+.empty{text-align:center;padding:38px 20px}
+.empty-ico{font-size:38px;margin-bottom:11px;opacity:.3}
+.empty-txt{font-size:14px;color:var(--text-m)}
+
+/* NOTIFICATION */
+.notif{position:fixed;bottom:22px;right:22px;background:var(--sidebar-bg);color:#fff;border-radius:var(--rs);padding:12px 17px;font-size:13px;display:flex;align-items:center;gap:9px;z-index:999;box-shadow:var(--shadow-l);transform:translateX(120%);transition:transform .3s ease;max-width:290px}
+.notif.show{transform:translateX(0)}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(26,26,46,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:22px;opacity:0;pointer-events:none;transition:opacity .22s}
+.modal-ov.open{opacity:1;pointer-events:all}
+.modal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:30px;width:100%;max-width:430px;box-shadow:var(--shadow-l);transform:translateY(13px) scale(.97);transition:transform .22s;position:relative}
+.modal-ov.open .modal-card{transform:translateY(0) scale(1)}
+.modal-x{position:absolute;top:13px;right:13px;background:var(--bg);border:1px solid var(--border);color:var(--text-m);border-radius:6px;width:27px;height:27px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .2s}
+.modal-x:hover{background:var(--red-l);color:var(--red);border-color:var(--red)}
+.modal-title{font-family:var(--font-h);font-size:19px;color:var(--text);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--text-s);margin-bottom:22px}
+
+/* MISC */
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.sec-title{font-family:var(--font-h);font-size:clamp(20px,3vw,30px);font-weight:700;color:var(--text);line-height:1.25}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0}
+  .pc{padding:18px}
+  .topbar{padding:0 18px}
+  .an-grid{grid-template-columns:1fr}
+  #type-cards,#duration-cards{grid-template-columns:1fr 1fr}
+  #questions-cards{grid-template-columns:1fr 1fr 1fr}
+  .home-stats-row{grid-template-columns:1fr 1fr}
+  .home-steps{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notification">
+  <span id="notifIcon">✓</span>
+  <span id="notifText">Done</span>
+</div>
+
+<!-- ══════════════════════════════════════
+     FULLSCREEN PAGES (no sidebar)
+══════════════════════════════════════ -->
+
+<!-- LANDING (pre-login) -->
+<div id="page-landing" class="pgf">
+  <div style="max-width:840px;margin:auto;width:100%;padding:36px 20px;">
+    <div class="land-logo">Interview<span>Sphere</span></div>
+    <div class="land-logo-sub">AI-Powered Interview Platform</div>
+    <h1 class="land-title">Master <span>Interviews</span><br>with Confidence</h1>
+    <p class="land-desc">InterviewSphere simulates real Technical and HR interviews with AI scoring — giving you instant feedback to level up your career.</p>
+    <div class="land-actions">
+      <button class="btn-lp" onclick="navigate('signup')">Start Interview Free →</button>
+      <button class="btn-lg2" onclick="document.getElementById('lf').scrollIntoView({behavior:'smooth'})">See Features</button>
+    </div>
+    <div class="land-stats">
+      <div><div class="ls-val">98%</div><div class="ls-lbl">Success Rate</div></div>
+      <div><div class="ls-val">50K+</div><div class="ls-lbl">Students</div></div>
+      <div><div class="ls-val">500+</div><div class="ls-lbl">Questions</div></div>
+      <div><div class="ls-val">4.9★</div><div class="ls-lbl">User Rating</div></div>
+    </div>
+    <div class="land-feats" id="lf">
+      <div class="lf-card"><div class="lf-icon">🤖</div><div class="lf-title">AI Mock Interviews</div><div class="lf-desc">Keyword analysis, answer depth, communication quality — all evaluated instantly.</div></div>
+      <div class="lf-card"><div class="lf-icon">💻</div><div class="lf-title">Technical & HR Rounds</div><div class="lf-desc">DSA, OOP, DBMS for Technical; behavioral and situational for HR rounds.</div></div>
+      <div class="lf-card"><div class="lf-icon">📊</div><div class="lf-title">Detailed Scoring</div><div class="lf-desc">Granular scores on Communication, Confidence, and Depth after every session.</div></div>
+      <div class="lf-card"><div class="lf-icon">⏱️</div><div class="lf-title">Timed Sessions</div><div class="lf-desc">10 or 15-minute countdown timers simulating real interview pressure.</div></div>
+      <div class="lf-card"><div class="lf-icon">📈</div><div class="lf-title">Progress Analytics</div><div class="lf-desc">Score trends, category breakdowns, and full interview history over time.</div></div>
+      <div class="lf-card"><div class="lf-icon">🎯</div><div class="lf-title">Fully Customizable</div><div class="lf-desc">Configure session length and number of questions to your needs.</div></div>
+    </div>
+    <p style="text-align:center;margin-top:44px;font-size:12px;color:var(--s-text);">© 2025 InterviewSphere · Built for ambitious students</p>
+  </div>
+</div>
+
+<!-- SIGN UP -->
+<div id="page-signup" class="pgf">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-name">InterviewSphere</div>
+      <div class="auth-logo-sub">AI Interview Platform</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-title">Create Your Profile</div>
+      <div class="auth-sub">Set up your account to start practicing</div>
+      <div class="fg"><label class="fl">Full Name</label><input type="text" id="signup-name" class="fi" placeholder="e.g. Aryan Mehta" autocomplete="off"></div>
+      <div class="fg"><label class="fl">Email Address</label><input type="email" id="signup-email" class="fi" placeholder="e.g. aryan@example.com" autocomplete="off"></div>
+      <div class="fg">
+        <label class="fl">Education Level</label>
+        <select id="signup-edu" class="fs">
+          <option value="" disabled selected>Select your degree</option>
+          <option value="BTech">BTech — Bachelor of Technology</option>
+          <option value="BE">BE — Bachelor of Engineering</option>
+          <option value="BSc">BSc — Bachelor of Science</option>
+          <option value="BCA">BCA — Bachelor of Computer Applications</option>
+          <option value="Other Graduation">Other Graduation</option>
+        </select>
+      </div>
+      <button class="btn btn-primary w-full" style="margin-top:6px;" onclick="handleSignup()">Create Profile &amp; Continue →</button>
+      <div class="divider"></div>
+      <p style="text-align:center;font-size:13px;color:var(--text-m);">Already have a profile? <a href="#" onclick="navigateApp('dashboard');return false;">Go to Dashboard</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     APP SHELL — sidebar + main
+══════════════════════════════════════ -->
+<div class="app-shell" id="app-shell" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">InterviewSphere</div>
+      <div class="sb-logo-sub">Interview Platform</div>
+    </div>
+
+    <div class="sb-section">Navigation</div>
+    <nav class="sb-nav">
+      <button class="sb-link" id="nav-home" onclick="navigateApp('home')">
+        <span class="ico">🏠</span> Home
+      </button>
+    </nav>
+
+    <div class="sb-section">Main</div>
+    <nav class="sb-nav">
+      <button class="sb-link active" id="nav-dashboard" onclick="navigateApp('dashboard')">
+        <span class="ico">⊞</span> Dashboard
+      </button>
+      <button class="sb-link" id="nav-profile" onclick="navigateApp('profile')">
+        <span class="ico">◎</span> My Profile
+      </button>
+    </nav>
+
+    <div class="sb-section">Insights</div>
+    <nav class="sb-nav">
+      <button class="sb-link" id="nav-analytics" onclick="navigateApp('analytics')">
+        <span class="ico">▦</span> Analytics
+      </button>
+    </nav>
+
+    <div class="sb-spacer"></div>
+
+    <!-- Logout Button -->
+    <div class="sb-bottom-section">
+      <button class="sb-logout-btn" onclick="handleLogout()">
+        <span class="ico">⏻</span> Logout
+      </button>
+    </div>
+
+    <!-- User avatar at bottom -->
+    <div class="sb-user" id="sb-user-card">
+      <div class="sb-avatar" id="sb-avatar">?</div>
+      <div style="flex:1;min-width:0;">
+        <div class="sb-uname" id="sb-uname">—</div>
+        <div class="sb-urole" id="sb-urole">Student</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="tb-crumb">InterviewSphere / <span id="tb-title">Home</span></div>
+      <div id="topbar-actions"></div>
+    </div>
+
+    <!-- ── HOME PAGE (inside app shell) ── -->
+    <div class="pg" id="page-home" style="padding:0;overflow-y:auto;">
+
+      <!-- HERO SECTION -->
+      <div class="home-section-hero">
+        <div class="home-orb home-orb1"></div>
+        <div class="home-orb home-orb2"></div>
+        <div class="home-grid-bg"></div>
+        <div class="home-hero-inner">
+          <div class="home-hero-tag"><div class="home-pulse"></div>AI-Powered Interview Platform</div>
+          <h1 class="home-hero-title">Master <span class="home-accent-text">Interviews</span><br>with Confidence</h1>
+          <p class="home-hero-desc">InterviewSphere simulates real Technical and HR interviews using AI scoring, giving you instant feedback to level up your career readiness.</p>
+          <div class="home-hero-actions">
+            <button class="btn btn-primary" style="padding:13px 30px;font-size:15px;" onclick="navigateApp('dashboard')">Start Interview Free →</button>
+            <button class="home-ghost-btn" onclick="document.getElementById('home-features').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+          </div>
+          <div class="home-stats-strip">
+            <div class="home-stat-item"><div class="home-stat-val">98%</div><div class="home-stat-lbl">Success Rate</div></div>
+            <div class="home-stat-item"><div class="home-stat-val">50K+</div><div class="home-stat-lbl">Students Trained</div></div>
+            <div class="home-stat-item"><div class="home-stat-val">500+</div><div class="home-stat-lbl">Interview Questions</div></div>
+            <div class="home-stat-item"><div class="home-stat-val">4.9★</div><div class="home-stat-lbl">User Rating</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLATFORM FEATURES SECTION -->
+      <div class="home-section" id="home-features">
+        <div class="home-section-eyebrow">Platform Features</div>
+        <h2 class="home-section-title">Every step you take in learning<br>brings you closer to the career you dream of</h2>
+        <p class="home-section-sub">From mock interviews to real-time feedback — we cover the full spectrum of interview preparation.</p>
+        <div class="home-feats-grid">
+          <div class="home-feat-card">
+            <div class="home-feat-icon-box">🤖</div>
+            <div class="home-feat-title">AI-Based Mock Interviews</div>
+            <div class="home-feat-desc">Our intelligent simulation engine evaluates your responses using keyword analysis, answer depth, and communication quality to give you real scores.</div>
+          </div>
+          <div class="home-feat-card">
+            <div class="home-feat-icon-box">💻</div>
+            <div class="home-feat-title">Technical & HR Rounds</div>
+            <div class="home-feat-desc">Practice both Technical rounds covering DSA, OOP, and core CS concepts — as well as HR rounds focused on behavioral and situational questions.</div>
+          </div>
+          <div class="home-feat-card">
+            <div class="home-feat-icon-box">📊</div>
+            <div class="home-feat-title">Detailed Feedback & Scoring</div>
+            <div class="home-feat-desc">Receive granular scoring across Communication, Confidence, and Technical Depth with actionable improvement suggestions after every session.</div>
+          </div>
+          <div class="home-feat-card">
+            <div class="home-feat-icon-box">⏱️</div>
+            <div class="home-feat-title">Timed Interview Sessions</div>
+            <div class="home-feat-desc">Train under real pressure with configurable 10 or 15-minute countdown timers that simulate actual interview conditions.</div>
+          </div>
+          <div class="home-feat-card">
+            <div class="home-feat-icon-box">📈</div>
+            <div class="home-feat-title">Progress Analytics</div>
+            <div class="home-feat-desc">Visualize your improvement over time with score trends, category breakdowns, and interview history — all stored securely on your device.</div>
+          </div>
+          <div class="home-feat-card">
+            <div class="home-feat-icon-box">🎯</div>
+            <div class="home-feat-title">Customizable Difficulty</div>
+            <div class="home-feat-desc">Configure session length and number of questions to match your current preparation level and focus areas.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS SECTION -->
+      <div class="home-section home-section-alt">
+        <div class="home-section-eyebrow">How It Works</div>
+        <h2 class="home-section-title">Four steps to interview mastery</h2>
+        <div class="home-steps-grid">
+          <div class="home-step-card">
+            <div class="home-step-num">01</div>
+            <div class="home-step-title">Create Profile</div>
+            <p class="home-step-desc">Sign up with your education details to personalize your experience.</p>
+          </div>
+          <div class="home-step-card">
+            <div class="home-step-num">02</div>
+            <div class="home-step-title">Choose Format</div>
+            <p class="home-step-desc">Select Technical or HR, pick duration and number of questions.</p>
+          </div>
+          <div class="home-step-card">
+            <div class="home-step-num">03</div>
+            <div class="home-step-title">Take Interview</div>
+            <p class="home-step-desc">Answer questions under a live timer, just like the real thing.</p>
+          </div>
+          <div class="home-step-card">
+            <div class="home-step-num">04</div>
+            <div class="home-step-title">Review & Improve</div>
+            <p class="home-step-desc">Get detailed AI feedback and track your progress on the analytics dashboard.</p>
+          </div>
+        </div>
+
+        <!-- CTA BANNER -->
+        <div class="home-cta-banner">
+          <h2 class="home-cta-title">Ready to ace your next interview?</h2>
+          <p class="home-cta-sub">Join thousands of students who are already preparing smarter.</p>
+          <button class="btn btn-primary" style="padding:13px 32px;font-size:15px;" onclick="navigateApp('dashboard')">Go to Dashboard →</button>
+        </div>
+
+        <p style="text-align:center;font-size:12px;color:var(--text-m);padding-bottom:8px;">© 2025 InterviewSphere · Built for ambitious students</p>
+      </div>
+
+    </div>
+
+    <!-- ── DASHBOARD ── -->
+    <div class="pg pc" id="page-dashboard">
+      <div class="ph-greeting" id="dash-greeting">Good morning 👋</div>
+      <div class="ph-sub" id="dash-date">Here's your interview overview</div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="sc-label">Total Sessions</div>
+          <div class="sc-value dark" id="dash-total">0</div>
+          <div class="sc-hint" id="dash-total-hint">No sessions yet</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Best Score</div>
+          <div class="sc-value green" id="dash-best">—</div>
+          <div class="sc-hint up" id="dash-best-hint">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Average Score</div>
+          <div class="sc-value blue" id="dash-avg">—</div>
+          <div class="sc-hint" id="dash-avg-hint">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Day Streak</div>
+          <div class="sc-value red" id="dash-streak">0</div>
+          <div class="sc-hint">consecutive days</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">⚙️ Configure Interview Session</div></div>
+
+        <div class="cfg-label">Interview Type</div>
+        <div class="option-cards" id="type-cards">
+          <div class="option-card selected" onclick="selectOption('type','Technical',this)"><div class="oc-icon">💻</div><div class="oc-label">Technical</div><div class="oc-sub">DSA, OOP, DBMS &amp; more</div></div>
+          <div class="option-card" onclick="selectOption('type','HR',this)"><div class="oc-icon">🤝</div><div class="oc-label">HR Round</div><div class="oc-sub">Behavioral &amp; Situational</div></div>
+        </div>
+
+        <div class="cfg-label">Duration</div>
+        <div class="option-cards" id="duration-cards">
+          <div class="option-card selected" onclick="selectOption('duration',10,this)"><div class="oc-icon">⏱️</div><div class="oc-label">10 Minutes</div><div class="oc-sub">Quick practice</div></div>
+          <div class="option-card" onclick="selectOption('duration',15,this)"><div class="oc-icon">⏳</div><div class="oc-label">15 Minutes</div><div class="oc-sub">Full mock</div></div>
+        </div>
+
+        <div class="cfg-label">Number of Questions</div>
+        <div class="option-cards" id="questions-cards">
+          <div class="option-card selected" onclick="selectOption('questions',5,this)"><div class="oc-icon">📝</div><div class="oc-label">5 Questions</div><div class="oc-sub">Quick mode</div></div>
+          <div class="option-card" onclick="selectOption('questions',10,this)"><div class="oc-icon">📋</div><div class="oc-label">10 Questions</div><div class="oc-sub">Standard</div></div>
+          <div class="option-card" onclick="selectOption('questions',15,this)"><div class="oc-icon">📑</div><div class="oc-label">15 Questions</div><div class="oc-sub">Full interview</div></div>
+        </div>
+
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div style="font-size:13px;color:var(--text-s);">Session: <strong id="session-summary" style="color:var(--accent);">Technical · 10 min · 5 Questions</strong></div>
+          <button class="btn btn-primary" onclick="startInterview()">Start Interview →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE ── -->
+    <div class="pg pc" id="page-profile">
+      <div class="eyebrow">My Profile</div>
+      <h1 class="sec-title" style="margin-bottom:22px;">Your InterviewSphere Profile</h1>
+
+      <div class="profile-hero">
+        <div class="p-avatar" id="profile-avatar">A</div>
+        <div>
+          <div class="p-name" id="profile-name">—</div>
+          <div class="p-email" id="profile-email">—</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;">
+            <span class="badge badge-green" id="profile-edu-badge">—</span>
+            <span class="badge badge-blue" id="profile-joined-badge">Joined Today</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-info-grid">
+        <div class="p-tile"><div class="p-tile-l">Education</div><div class="p-tile-v" id="pi-edu">—</div></div>
+        <div class="p-tile"><div class="p-tile-l">Interviews Taken</div><div class="p-tile-v" id="pi-interviews">0</div></div>
+        <div class="p-tile"><div class="p-tile-l">Best Score</div><div class="p-tile-v" id="pi-best">—</div></div>
+        <div class="p-tile"><div class="p-tile-l">Average Score</div><div class="p-tile-v" id="pi-avg">—</div></div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="navigateApp('dashboard')">Go to Dashboard →</button>
+        <button class="btn btn-ghost" onclick="navigateApp('analytics')">View Analytics</button>
+        <button class="btn btn-outline" onclick="openEditModal()">✏️ Edit Profile</button>
+      </div>
+    </div>
+
+    <!-- ── INTERVIEW ── -->
+    <div class="pg pc" id="page-interview">
+      <div class="iv-wrap">
+        <div class="iv-hdr">
+          <div style="display:flex;align-items:center;gap:13px;flex-wrap:wrap;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-s);">Question <span id="q-current">1</span> / <span id="q-total">5</span></div>
+            <div class="prog-dots" id="progress-dots"></div>
+          </div>
+          <div class="timer" id="timer-display"><span>⏱</span><span id="timer-text">10:00</span></div>
+        </div>
+        <div class="pbar-track"><div class="pbar-fill" id="interview-progress" style="width:0%"></div></div>
+        <div class="q-card" id="question-card">
+          <div class="q-lbl" id="q-type-label">TECHNICAL QUESTION</div>
+          <div class="q-text" id="q-text">Loading...</div>
+          <span class="badge badge-green" id="q-category-badge">Category</span>
+        </div>
+        <div class="a-card">
+          <div class="a-lbl">✍️ Your Answer</div>
+          <textarea class="ft" id="answer-input" placeholder="Type your answer here. Be as detailed as possible — aim for 40–60+ words using relevant terms." oninput="updateWordCount()"></textarea>
+          <div class="wch" id="word-count-hint">0 words typed</div>
+        </div>
+        <div class="iv-footer">
+          <div style="font-size:12px;color:var(--text-m);">💡 Use specific examples and technical terms for higher scores</div>
+          <div style="display:flex;gap:9px;">
+            <button class="btn btn-ghost btn-sm" onclick="nextQuestion(true)">Skip</button>
+            <button class="btn btn-primary" id="next-btn" onclick="nextQuestion(false)">Next Question →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EVALUATION ── -->
+    <div class="pg pc" id="page-evaluation">
+      <div class="ev-wrap">
+        <div class="eyebrow">Interview Complete</div>
+        <h1 class="sec-title" style="margin-bottom:22px;">Your Performance Report</h1>
+
+        <div class="score-hero">
+          <div class="score-ring" id="score-ring-el">
+            <div><div class="score-num" id="eval-score">0</div><div class="score-den">/100</div></div>
+          </div>
+          <div class="score-grade" id="eval-grade-label">Calculating...</div>
+          <div class="score-sub" id="eval-grade-sub">—</div>
+        </div>
+
+        <h3 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:13px;">Section Breakdown</h3>
+        <div class="bk-grid">
+          <div class="bk-card">
+            <div class="bk-name">Communication</div>
+            <div class="bk-score" id="eval-comm">—</div>
+            <div class="pbar-track"><div class="pbar-fill" id="eval-comm-bar" style="width:0%;background:var(--blue)"></div></div>
+            <div style="font-size:12px;color:var(--text-m);margin-top:5px;" id="eval-comm-label">—</div>
+          </div>
+          <div class="bk-card">
+            <div class="bk-name" id="eval-depth-label">Technical Depth</div>
+            <div class="bk-score" id="eval-depth">—</div>
+            <div class="pbar-track"><div class="pbar-fill" id="eval-depth-bar" style="width:0%;background:var(--accent)"></div></div>
+            <div style="font-size:12px;color:var(--text-m);margin-top:5px;" id="eval-depth-sublabel">—</div>
+          </div>
+          <div class="bk-card">
+            <div class="bk-name">Confidence</div>
+            <div class="bk-score" id="eval-conf">—</div>
+            <div class="pbar-track"><div class="pbar-fill" id="eval-conf-bar" style="width:0%;background:#9b59b6"></div></div>
+            <div style="font-size:12px;color:var(--text-m);margin-top:5px;" id="eval-conf-sublabel">—</div>
+          </div>
+        </div>
+
+        <div class="fb-panels" style="margin-bottom:26px;">
+          <div class="fb-panel"><div class="fb-title" style="color:var(--accent);">✅ Strengths</div><div id="eval-strengths"></div></div>
+          <div class="fb-panel"><div class="fb-title" style="color:var(--amber);">⚠️ Weak Areas</div><div id="eval-weaknesses"></div></div>
+          <div class="fb-panel"><div class="fb-title" style="color:var(--blue);">🚀 Improvements</div><div id="eval-improvements"></div></div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="navigateApp('dashboard')">Take Another Interview</button>
+          <button class="btn btn-ghost" onclick="navigateApp('analytics')">View Analytics →</button>
+          <button class="btn btn-outline" onclick="navigateApp('profile')">My Profile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS ── -->
+    <div class="pg pc" id="page-analytics">
+      <div class="eyebrow">Analytics</div>
+      <h1 class="sec-title" style="margin-bottom:5px;">Your Progress Overview</h1>
+      <p style="font-size:13px;color:var(--text-m);margin-bottom:24px;">Track your improvement across all interview sessions</p>
+
+      <div class="stat-row" id="analytics-stats"></div>
+
+      <div class="an-grid">
+        <div class="chart-card">
+          <div class="chart-title"><span>Score Trend</span><span class="badge badge-green" id="analytics-trend-badge">All Time</span></div>
+          <div class="trend-wrap"><svg class="trend-svg" id="trend-svg" viewBox="0 0 400 140" preserveAspectRatio="none"></svg></div>
+          <div style="font-size:12px;margin-top:7px;" id="trend-note"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><span>Category Averages</span></div>
+          <div id="category-bar-chart" style="display:flex;align-items:flex-end;gap:18px;height:145px;padding:0 8px;"></div>
+          <div id="cat-labels" style="display:flex;gap:18px;padding:0 8px;margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-hdr" style="margin-bottom:14px;">
+          <div class="card-title">Interview History</div>
+          <button class="btn btn-ghost btn-sm" onclick="clearHistory()">Clear History</button>
+        </div>
+        <div class="ht-wrap" id="history-table-wrap">
+          <div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">No interviews yet. Start your first session!</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app-shell -->
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-ov" id="edit-modal" onclick="handleModalOverlayClick(event)">
+  <div class="modal-card">
+    <button class="modal-x" onclick="closeEditModal()">✕</button>
+    <div class="modal-title">Edit Profile</div>
+    <p class="modal-sub">Update your name, email, or education level</p>
+    <div class="fg"><label class="fl">Full Name</label><input type="text" id="edit-name" class="fi" placeholder="Your full name"></div>
+    <div class="fg"><label class="fl">Email Address</label><input type="email" id="edit-email" class="fi" placeholder="your@email.com"></div>
+    <div class="fg">
+      <label class="fl">Education Level</label>
+      <select id="edit-edu" class="fs">
+        <option value="BTech">BTech — Bachelor of Technology</option>
+        <option value="BE">BE — Bachelor of Engineering</option>
+        <option value="BSc">BSc — Bachelor of Science</option>
+        <option value="BCA">BCA — Bachelor of Computer Applications</option>
+        <option value="Other Graduation">Other Graduation</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:6px;">
+      <button class="btn btn-primary w-full" onclick="saveEditProfile()">Save Changes ✓</button>
+      <button class="btn btn-ghost" onclick="closeEditModal()" style="min-width:85px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+let appState = {
+  currentPage:'landing',
+  interviewConfig:{type:'Technical',duration:10,questions:5},
+  interview:{questions:[],answers:[],currentIndex:0,timerInterval:null,timeLeft:600,type:'Technical',duration:10}
+};
+
+const QUESTION_BANKS = {
+  Technical:[
+    {q:"Explain the difference between a stack and a queue. When would you use each?",cat:"Data Structures",keywords:["stack","queue","LIFO","FIFO","last in first out","first in first out","push","pop","enqueue","dequeue","array","list","order"]},
+    {q:"What is Object-Oriented Programming? Explain the four core principles with examples.",cat:"OOP",keywords:["encapsulation","inheritance","polymorphism","abstraction","class","object","method","interface","extends","override","subclass","parent"]},
+    {q:"What is the difference between a primary key and a foreign key in a relational database?",cat:"DBMS",keywords:["primary key","foreign key","unique","references","constraint","table","relation","null","identifier","integrity","row","column"]},
+    {q:"Explain Big O notation. What is the time complexity of binary search?",cat:"Algorithms",keywords:["big o","time complexity","O(log n)","binary search","worst case","best case","n log n","space complexity","O(n)","O(1)","logarithm","divide"]},
+    {q:"What is a RESTful API? What are the HTTP methods and when would you use them?",cat:"Web/API",keywords:["REST","GET","POST","PUT","DELETE","PATCH","stateless","endpoint","HTTP","status code","request","response","resource","URL"]},
+    {q:"Describe how garbage collection works in Java or Python. What are memory leaks?",cat:"Memory",keywords:["garbage collection","heap","memory leak","reference","JVM","GC","automatic","deallocation","pointer","unreachable","allocated","Python","Java"]},
+    {q:"What is a deadlock? How can it be prevented in a multi-threaded environment?",cat:"OS",keywords:["deadlock","mutual exclusion","hold and wait","no preemption","circular wait","thread","mutex","semaphore","lock","prevention","avoidance","banker"]},
+    {q:"Explain the difference between SQL and NoSQL databases. When would you choose each?",cat:"Databases",keywords:["SQL","NoSQL","relational","document","schema","MongoDB","scalability","ACID","flexible","table","JSON","key-value","horizontal"]},
+    {q:"What is recursion? Write the logic for computing factorial using recursion.",cat:"Programming",keywords:["recursion","base case","recursive call","stack","factorial","function","return","n-1","stop condition","n*","call itself","depth"]},
+    {q:"What are design patterns? Explain the Singleton and Observer patterns.",cat:"Design Patterns",keywords:["design pattern","singleton","observer","instance","one instance","subscribe","notify","pattern","creational","behavioral","listener","event"]},
+    {q:"What is a linked list? Differences between singly and doubly linked lists?",cat:"Data Structures",keywords:["linked list","node","pointer","next","prev","singly","doubly","head","tail","traverse","insert","delete","O(1)"]},
+    {q:"Explain normalization in databases (1NF, 2NF, 3NF).",cat:"DBMS",keywords:["normalization","1NF","2NF","3NF","anomaly","redundancy","functional dependency","partial","transitive","atomic","candidate key"]},
+    {q:"What is the difference between process and thread? What is context switching?",cat:"OS",keywords:["process","thread","context switch","PCB","lightweight","memory","CPU","scheduler","concurrent","parallel","register","state"]},
+    {q:"What is dynamic programming? Explain with an example like Fibonacci or knapsack.",cat:"Algorithms",keywords:["dynamic programming","memoization","tabulation","overlapping","subproblem","fibonacci","optimal","bottom-up","top-down","cache","DP","solve"]},
+    {q:"What is the purpose of indexing in a database? How does it improve performance?",cat:"DBMS",keywords:["index","B-tree","performance","lookup","query","search","column","faster","trade-off","storage","scan","retrieve","pointer"]}
+  ],
+  HR:[
+    {q:"Tell me about yourself and why you're interested in this role.",cat:"Introduction",keywords:["background","experience","skills","interested","passionate","career","goal","strength","learn","contribute","studied","worked","project"]},
+    {q:"Describe a situation where you faced a significant challenge. How did you overcome it?",cat:"Problem Solving",keywords:["challenge","difficult","solution","overcome","learned","team","approach","result","improved","strategy","faced","managed","decided"]},
+    {q:"Where do you see yourself in the next 5 years? What are your long-term career goals?",cat:"Career Goals",keywords:["future","grow","leadership","skills","career","senior","manager","contribute","advance","specialize","years","role","vision"]},
+    {q:"What are your greatest strengths and how have they helped you succeed?",cat:"Self-Assessment",keywords:["strength","analytical","communication","teamwork","leadership","problem solving","dedicated","fast learner","creative","helped","achieved","example"]},
+    {q:"Tell me about a time you worked in a team and faced conflict. How did you resolve it?",cat:"Teamwork",keywords:["team","conflict","resolve","communication","compromise","understand","collaborate","result","listen","perspective","discussed","agreed","worked"]},
+    {q:"Why do you want to work for our company specifically? What do you know about us?",cat:"Company Fit",keywords:["values","culture","mission","product","innovation","growth","opportunity","research","aligned","excited","company","work","because"]},
+    {q:"Describe a time when you had to meet a tight deadline. What was your approach?",cat:"Time Management",keywords:["deadline","prioritize","organize","plan","time management","deliver","pressure","efficient","schedule","complete","task","hours","urgent"]},
+    {q:"What is your biggest weakness and what are you doing to improve it?",cat:"Self-Assessment",keywords:["weakness","improve","working on","awareness","feedback","course","practice","better","recognize","growth","learning","developing","habit"]},
+    {q:"Describe a situation where you showed leadership, even without a formal role.",cat:"Leadership",keywords:["lead","initiative","motivated","guided","decision","responsibility","team","outcome","ownership","stepped up","organized","directed","helped"]},
+    {q:"How do you handle feedback and criticism? Give an example from your experience.",cat:"Feedback",keywords:["feedback","criticism","accept","improve","constructive","learn","apply","open","grow","grateful","received","changed","better"]},
+    {q:"What motivates you in your work? How do you stay productive during difficult times?",cat:"Motivation",keywords:["motivated","passion","challenge","growth","achievement","impact","goal","discipline","focused","purpose","enjoy","drive","inspires"]},
+    {q:"Tell me about a project you are most proud of. What was your contribution?",cat:"Achievement",keywords:["project","contribution","role","result","impact","built","designed","solved","achievement","outcome","developed","created","led"]},
+    {q:"How do you prioritize tasks when you have multiple deadlines at the same time?",cat:"Organization",keywords:["prioritize","urgent","important","matrix","deadline","organize","list","focus","delegate","schedule","eisenhower","first","then"]},
+    {q:"How do you approach learning a new technology or skill quickly?",cat:"Learning Agility",keywords:["learn","practice","documentation","project","courses","hands-on","experiment","research","mentor","apply","tutorial","built","understand"]},
+    {q:"What does success look like to you in a professional setting?",cat:"Values",keywords:["success","impact","grow","deliver","quality","team","achieve","goal","contribute","recognition","complete","value","means"]}
+  ]
+};
+
+// ── NAVIGATION ──
+function navigate(page) {
+  document.querySelectorAll('.pgf').forEach(p=>p.classList.remove('active'));
+  document.getElementById('app-shell').style.display='none';
+  if(page==='landing'||page==='signup'){
+    document.getElementById('page-'+page).classList.add('active');
+  } else { navigateApp(page); }
+  appState.currentPage=page;
+  window.scrollTo(0,0);
+}
+function navigateApp(page) {
+  document.querySelectorAll('.pgf').forEach(p=>p.classList.remove('active'));
+  document.getElementById('app-shell').style.display='flex';
+  document.querySelectorAll('.app-shell .pg').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nav-'+page);
+  if(nb) nb.classList.add('active');
+  const titles={home:'Home',dashboard:'Dashboard',profile:'My Profile',analytics:'Analytics',interview:'Interview',evaluation:'Results'};
+  const tt=document.getElementById('tb-title');
+  if(tt) tt.textContent=titles[page]||page;
+  // Show start interview button only on non-home, non-interview pages
+  const tba=document.getElementById('topbar-actions');
+  if(tba){
+    if(page==='interview'||page==='home'){
+      tba.innerHTML='';
+    } else {
+      tba.innerHTML='<button class="btn-new" onclick="navigateApp(\'dashboard\')">+ Start Interview</button>';
+    }
+  }
+  appState.currentPage=page;
+  if(page==='profile') renderProfile();
+  if(page==='dashboard') renderDashboard();
+  if(page==='analytics') renderAnalytics();
+  window.scrollTo(0,0);
+}
+
+// ── STORAGE ──
+function getUser(){try{return JSON.parse(localStorage.getItem('is_user'));}catch{return null;}}
+function saveUser(u){localStorage.setItem('is_user',JSON.stringify(u));}
+function getHistory(){try{return JSON.parse(localStorage.getItem('is_history'))||[];}catch{return[];}}
+function saveHistory(h){localStorage.setItem('is_history',JSON.stringify(h));}
+function addToHistory(r){const h=getHistory();h.push(r);saveHistory(h);}
+
+// ── SIGN UP ──
+function handleSignup(){
+  const name=document.getElementById('signup-name').value.trim();
+  const email=document.getElementById('signup-email').value.trim();
+  const edu=document.getElementById('signup-edu').value;
+  if(!name){showNotif('❗','Please enter your full name.');return;}
+  if(!email||!email.includes('@')){showNotif('❗','Please enter a valid email.');return;}
+  if(!edu){showNotif('❗','Please select your education level.');return;}
+  saveUser({name,email,edu,joinedAt:new Date().toISOString()});
+  showNotif('✅','Profile created!');
+  updateSidebarUser();
+  setTimeout(()=>navigateApp('home'),400);
+}
+
+// ── SIDEBAR USER ──
+function updateSidebarUser(){
+  const user=getUser();if(!user)return;
+  const initials=user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sb-avatar').textContent=initials;
+  document.getElementById('sb-uname').textContent=user.name;
+  document.getElementById('sb-urole').textContent=user.edu||'Student';
+}
+
+// ── PROFILE ──
+function renderProfile(){
+  const user=getUser();if(!user){navigate('signup');return;}
+  const initials=user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('profile-avatar').textContent=initials;
+  document.getElementById('profile-name').textContent=user.name;
+  document.getElementById('profile-email').textContent=user.email;
+  document.getElementById('profile-edu-badge').textContent=user.edu;
+  document.getElementById('profile-joined-badge').textContent='Joined '+formatDate(user.joinedAt);
+  document.getElementById('pi-edu').textContent=user.edu;
+  const history=getHistory();
+  const scores=history.map(h=>Number(h.totalScore)).filter(s=>!isNaN(s));
+  document.getElementById('pi-interviews').textContent=history.length;
+  document.getElementById('pi-best').textContent=scores.length?Math.max(...scores)+'/100':'—';
+  document.getElementById('pi-avg').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length)+'/100':'—';
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const user=getUser();
+  const history=getHistory();
+  const scores=history.map(h=>Number(h.totalScore)).filter(s=>!isNaN(s));
+  const hour=new Date().getHours();
+  const greet=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+  const emoji=hour<12?'👋':hour<17?'☀️':'🌙';
+  document.getElementById('dash-greeting').textContent=`${greet}, ${user?.name?.split(' ')[0]||''} ${emoji}`;
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})+' · Here\'s your interview overview';
+  document.getElementById('dash-total').textContent=history.length;
+  document.getElementById('dash-total-hint').textContent=history.length?`${history.length} session${history.length>1?'s':''} completed`:'No sessions yet';
+  document.getElementById('dash-best').textContent=scores.length?Math.max(...scores):'—';
+  document.getElementById('dash-best-hint').textContent=scores.length?'out of 100':'—';
+  document.getElementById('dash-avg').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):'—';
+  document.getElementById('dash-avg-hint').textContent=scores.length?'avg across all sessions':'—';
+  let streak=0;
+  if(history.length>0){const today=new Date().toDateString();const last=new Date(history[history.length-1].date).toDateString();streak=last===today?Math.min(history.length,7):0;}
+  document.getElementById('dash-streak').textContent=streak;
+  updateSessionSummary();
+}
+function selectOption(group,value,el){
+  el.parentElement.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  appState.interviewConfig[group]=value;
+  updateSessionSummary();
+}
+function updateSessionSummary(){
+  const{type,duration,questions}=appState.interviewConfig;
+  document.getElementById('session-summary').textContent=`${type} · ${duration} min · ${questions} Questions`;
+}
+
+// ── INTERVIEW ENGINE ──
+function startInterview(){
+  const user=getUser();if(!user){showNotif('❗','Please create a profile first.');navigate('signup');return;}
+  const{type,duration,questions}=appState.interviewConfig;
+  const bank=[...QUESTION_BANKS[type]];shuffleArray(bank);
+  const selected=bank.slice(0,Math.min(questions,bank.length));
+  appState.interview={questions:selected,answers:new Array(selected.length).fill(''),currentIndex:0,timerInterval:null,timeLeft:duration*60,type,duration};
+  renderInterviewPage();navigateApp('interview');startTimer();
+}
+function renderInterviewPage(){
+  const{questions,currentIndex}=appState.interview;const total=questions.length;const q=questions[currentIndex];
+  document.getElementById('q-current').textContent=currentIndex+1;
+  document.getElementById('q-total').textContent=total;
+  document.getElementById('q-type-label').textContent=appState.interview.type.toUpperCase()+' QUESTION';
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('q-category-badge').textContent=q.cat;
+  document.getElementById('answer-input').value=appState.interview.answers[currentIndex]||'';
+  document.getElementById('interview-progress').style.width=(currentIndex/total*100)+'%';
+  updateWordCount();
+  const de=document.getElementById('progress-dots');de.innerHTML='';
+  for(let i=0;i<total;i++){const d=document.createElement('div');d.className='pdot'+(i<currentIndex?' done':i===currentIndex?' cur':'');de.appendChild(d);}
+  document.getElementById('next-btn').textContent=(currentIndex===total-1)?'Submit Interview ✓':'Next Question →';
+}
+function updateWordCount(){
+  const text=document.getElementById('answer-input').value.trim();
+  const words=text===''?0:text.split(/\s+/).filter(w=>w.length>0).length;
+  const h=document.getElementById('word-count-hint');
+  h.textContent=words+' word'+(words!==1?'s':'')+' typed';
+  h.className='wch'+(words>=50?' good':words>=20?' ok':'');
+}
+function nextQuestion(skip){
+  if(!skip)appState.interview.answers[appState.interview.currentIndex]=document.getElementById('answer-input').value.trim();
+  else appState.interview.answers[appState.interview.currentIndex]='';
+  const next=appState.interview.currentIndex+1;
+  if(next>=appState.interview.questions.length){clearInterval(appState.interview.timerInterval);evaluateInterview();}
+  else{
+    appState.interview.currentIndex=next;renderInterviewPage();
+    const c=document.getElementById('question-card');c.style.animation='none';c.offsetHeight;c.style.animation='fu .35s ease';
+  }
+}
+
+// ── TIMER ──
+function startTimer(){
+  updateTimerDisplay();
+  appState.interview.timerInterval=setInterval(()=>{
+    appState.interview.timeLeft--;updateTimerDisplay();
+    if(appState.interview.timeLeft<=0){
+      clearInterval(appState.interview.timerInterval);
+      appState.interview.answers[appState.interview.currentIndex]=document.getElementById('answer-input').value.trim();
+      showNotif('⏰',"Time's up! Submitting...");setTimeout(evaluateInterview,1000);
+    }
+  },1000);
+}
+function updateTimerDisplay(){
+  const t=appState.interview.timeLeft;
+  document.getElementById('timer-text').textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+  const el=document.getElementById('timer-display');el.classList.remove('warning','danger');
+  if(t<=60)el.classList.add('danger');else if(t<=180)el.classList.add('warning');
+}
+
+// ── SCORING ENGINE ──
+function scoreAnswer(answer,keywords){
+  if(!answer||answer.trim().length===0)return{total:5,comm:5,depth:5,conf:5};
+  const text=answer.toLowerCase().trim();
+  const words=text.split(/\s+/).filter(w=>w.length>1);const wordCount=words.length;
+  if(wordCount<5)return{total:8,comm:8,depth:5,conf:6};
+  const sk=Array.isArray(keywords)?keywords:[];
+  const matched=sk.filter(kw=>kw&&text.includes(kw.toLowerCase()));
+  const kwM=matched.length,kwR=kwM/(sk.length||1);
+  const sentences=answer.split(/[.!?]+/).filter(s=>s.trim().length>3);
+  const sC=sentences.length,hasPunct=/[.!?,;:]/.test(answer),avgWPS=sC>0?wordCount/sC:wordCount,goodLen=avgWPS>=7&&avgWPS<=30;
+  let comm=0,depth=0,conf=0;
+  comm+=Math.min(35,wordCount*0.55);comm+=hasPunct?10:0;comm+=goodLen?20:8;comm+=sC>=3?15:sC===2?8:0;comm+=wordCount>=80?10:wordCount>=50?6:0;
+  depth+=Math.round(kwR*55);depth+=Math.min(30,wordCount*0.4);depth+=kwM>=5?12:kwM>=3?7:kwM>=1?3:0;
+  conf+=Math.min(40,wordCount*0.6);conf+=kwR>=0.3?20:kwR>=0.15?12:5;conf+=wordCount>=30?20:wordCount>=15?12:5;conf+=sC>=2?8:0;
+  const v=()=>Math.round((Math.random()-0.5)*16);const cl=n=>Math.min(100,Math.max(1,Math.round(n)));
+  const cF=cl(comm+v()),dF=cl(depth+v()),xF=cl(conf+v());
+  return{total:cl(cF*0.28+dF*0.47+xF*0.25),comm:cF,depth:dF,conf:xF};
+}
+function evaluateInterview(){
+  const{questions,answers,type}=appState.interview;
+  let tA=0,cA=0,dA=0,xA=0,answered=0;
+  answers.forEach((ans,i)=>{const q=questions[i]||{keywords:[]};const r=scoreAnswer(ans,q.keywords);tA+=r.total;cA+=r.comm;dA+=r.depth;xA+=r.conf;if(ans&&ans.trim().length>0)answered++;});
+  const n=Math.max(questions.length,1);const avg=v=>Math.min(100,Math.max(0,Math.round(v/n)));
+  const ts=avg(tA),cs=avg(cA),ds=avg(dA),xs=avg(xA);
+  const fb=generateFeedback(ts,cs,ds,xs,type,answered,questions.length);
+  addToHistory({date:new Date().toISOString(),type,duration:appState.interview.duration,totalScore:ts,commScore:cs,depthScore:ds,confScore:xs,questionsCount:questions.length,answeredCount:answered});
+  renderEvaluation(ts,cs,ds,xs,fb,type);navigateApp('evaluation');
+}
+function generateFeedback(total,comm,depth,conf,type,answered,total_q){
+  const strengths=[],weaknesses=[],improvements=[];const skipped=total_q-answered;
+  if(comm>=70)strengths.push('Clear and well-structured communication style');
+  if(depth>=70)strengths.push(type==='Technical'?'Strong technical vocabulary and concept clarity':'Detailed and well-framed HR responses');
+  if(conf>=70)strengths.push('Confident and comprehensive answers throughout');
+  if(total>=80)strengths.push('Consistently high-quality responses across the session');
+  if(answered===total_q)strengths.push('Completed all questions without skipping — great commitment!');
+  if(strengths.length===0)strengths.push('Showed effort in attempting the interview');
+  if(skipped>0)weaknesses.push(`Skipped ${skipped} question${skipped>1?'s':''} — attempt all for a better score`);
+  if(comm<60)weaknesses.push('Communication needs more structure — use clear, complete sentences');
+  if(depth<60)weaknesses.push(type==='Technical'?'Technical depth needs improvement — include precise terminology':'HR answers need more specifics — use the STAR method');
+  if(conf<60)weaknesses.push('Answers were too brief — aim for 40–80 words per answer');
+  if(total<50)weaknesses.push('Overall responses lacked depth and relevant content');
+  improvements.push('Practice explaining concepts aloud using the "Feynman technique"');
+  improvements.push('Aim for 40–80 words per answer using domain-specific terms');
+  if(type==='Technical'){improvements.push('Review core CS: Data Structures, OS, DBMS, OOP, Algorithms');improvements.push('Solve problems on LeetCode/HackerRank daily');}
+  else{improvements.push('Prepare 5–7 STAR-format stories for common behavioral questions');improvements.push('Research company values and align answers to their mission');}
+  improvements.push('Take multiple timed practice sessions to improve speed and fluency');
+  return{strengths:strengths.slice(0,4),weaknesses:weaknesses.slice(0,4),improvements:improvements.slice(0,4)};
+}
+function renderEvaluation(total,comm,depth,conf,feedback,type){
+  const pct=total/100;
+  document.getElementById('score-ring-el').style.background=`conic-gradient(from -90deg,#3d9970 0%,#3d9970 ${pct*100}%,#e8e4dc ${pct*100}%)`;
+  animateCount('eval-score',0,total,1200);
+  let grade='',gradeColor='';
+  if(total>=85){grade='Excellent Performance';gradeColor='#3d9970';}
+  else if(total>=70){grade='Good Performance';gradeColor='#4361ee';}
+  else if(total>=55){grade='Average Performance';gradeColor='#f4a261';}
+  else{grade='Needs Improvement';gradeColor='#e63946';}
+  document.getElementById('eval-grade-label').textContent=grade;
+  document.getElementById('eval-grade-label').style.color=gradeColor;
+  document.getElementById('eval-grade-sub').textContent=`Score: ${total}/100 · ${type} Interview`;
+  setTimeout(()=>{
+    document.getElementById('eval-comm').textContent=comm+'/100';
+    document.getElementById('eval-comm-bar').style.width=comm+'%';
+    document.getElementById('eval-comm-label').textContent=comm>=70?'✓ Strong':comm>=50?'△ Average':'✗ Needs Work';
+    document.getElementById('eval-depth-label').textContent=type==='Technical'?'Technical Depth':'HR Clarity';
+    document.getElementById('eval-depth').textContent=depth+'/100';
+    document.getElementById('eval-depth-bar').style.width=depth+'%';
+    document.getElementById('eval-depth-sublabel').textContent=depth>=70?'✓ Strong':depth>=50?'△ Average':'✗ Needs Work';
+    document.getElementById('eval-conf').textContent=conf+'/100';
+    document.getElementById('eval-conf-bar').style.width=conf+'%';
+    document.getElementById('eval-conf-sublabel').textContent=conf>=70?'✓ Strong':conf>=50?'△ Average':'✗ Needs Work';
+  },300);
+  const rl=(id,items)=>{document.getElementById(id).innerHTML=items.map(i=>`<div class="fb-item">${i}</div>`).join('')||'<div class="fb-item">Good effort — keep practicing!</div>';};
+  rl('eval-strengths',feedback.strengths);rl('eval-weaknesses',feedback.weaknesses);rl('eval-improvements',feedback.improvements);
+}
+
+// ── ANALYTICS ──
+function renderAnalytics(){
+  const history=getHistory();
+  const safe=history.map(h=>({...h,totalScore:isNaN(Number(h.totalScore))?0:Number(h.totalScore),commScore:isNaN(Number(h.commScore))?0:Number(h.commScore),depthScore:isNaN(Number(h.depthScore))?0:Number(h.depthScore),confScore:isNaN(Number(h.confScore))?0:Number(h.confScore)}));
+  const sEl=document.getElementById('analytics-stats');
+  if(safe.length===0){
+    sEl.innerHTML=`<div class="stat-card"><div class="sc-label">Total Sessions</div><div class="sc-value dark">0</div></div><div class="stat-card"><div class="sc-label">Best Score</div><div class="sc-value green">—</div></div><div class="stat-card"><div class="sc-label">Avg Score</div><div class="sc-value blue">—</div></div><div class="stat-card"><div class="sc-label">Last Score</div><div class="sc-value dark">—</div></div>`;
+  }else{
+    const sc=safe.map(h=>h.totalScore),avg=Math.round(sc.reduce((a,b)=>a+b,0)/sc.length);
+    sEl.innerHTML=`<div class="stat-card"><div class="sc-label">Total Sessions</div><div class="sc-value dark">${safe.length}</div></div><div class="stat-card"><div class="sc-label">Best Score</div><div class="sc-value green">${Math.max(...sc)}</div></div><div class="stat-card"><div class="sc-label">Avg Score</div><div class="sc-value blue">${avg}</div></div><div class="stat-card"><div class="sc-label">Last Score</div><div class="sc-value dark">${sc[sc.length-1]}</div></div>`;
+  }
+  renderTrendChart(safe);renderCategoryChart(safe);renderHistoryTable(safe);
+}
+function renderTrendChart(history){
+  const svg=document.getElementById('trend-svg');svg.innerHTML='';const note=document.getElementById('trend-note');
+  if(history.length===0){svg.innerHTML=`<text x="200" y="70" text-anchor="middle" fill="#9999bb" font-family="Arial" font-size="13">No interviews yet</text>`;note.textContent='';return;}
+  if(history.length===1){
+    const s=history[0].totalScore;
+    svg.innerHTML=`<text x="200" y="55" text-anchor="middle" fill="#9999bb" font-family="Arial" font-size="13">Complete 2+ interviews to see trend</text><circle cx="200" cy="100" r="6" fill="#3d9970" stroke="#fff" stroke-width="2"/><text x="200" y="88" text-anchor="middle" fill="#3d9970" font-family="Arial" font-size="12" font-weight="bold">${s}</text>`;
+    note.textContent=`First interview: ${s}/100`;note.style.color='#3d9970';return;
+  }
+  const W=400,H=140,pL=32,pR=14,pT=24,pB=20;
+  const scores=history.map(h=>h.totalScore);
+  const minS=Math.max(0,Math.min(...scores)-10),maxS=Math.min(100,Math.max(...scores)+10),sR=maxS-minS||1;
+  const cW=W-pL-pR,cH=H-pT-pB;
+  const pts=scores.map((s,i)=>({x:Math.round((pL+(i/(scores.length-1))*cW)*10)/10,y:Math.round((pT+cH-((s-minS)/sR)*cH)*10)/10,s}));
+  svg.innerHTML=`<defs>
+    <linearGradient id="aG" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#3d9970" stop-opacity=".22"/><stop offset="100%" stop-color="#3d9970" stop-opacity=".01"/></linearGradient>
+    <linearGradient id="lG" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="#3d9970"/><stop offset="100%" stop-color="#4361ee"/></linearGradient>
+  </defs>`;
+  for(let i=0;i<=4;i++){
+    const y=pT+(i/4)*cH,v=Math.round(maxS-(i/4)*sR),isBase=i===4;
+    svg.innerHTML+=`<line x1="${pL}" y1="${y}" x2="${W-pR}" y2="${y}" stroke="${isBase?'rgba(26,26,46,.18)':'rgba(26,26,46,.07)'}" stroke-width="${isBase?1.5:1}" stroke-dasharray="${isBase?'':'4,5'}"/>`;
+    svg.innerHTML+=`<text x="${pL-5}" y="${y+4}" text-anchor="end" fill="#9999bb" font-family="Arial" font-size="10">${v}</text>`;
+  }
+  pts.forEach(p=>{svg.innerHTML+=`<line x1="${p.x}" y1="${pT}" x2="${p.x}" y2="${pT+cH}" stroke="rgba(26,26,46,.04)" stroke-width="1" stroke-dasharray="2,5"/>`;});
+  const bY=pT+cH;
+  svg.innerHTML+=`<path d="M${pts[0].x},${bY} ${pts.map(p=>`L${p.x},${p.y}`).join(' ')} L${pts[pts.length-1].x},${bY} Z" fill="url(#aG)"/>`;
+  svg.innerHTML+=`<path d="${pts.map((p,i)=>(i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`)).join(' ')}" fill="none" stroke="url(#lG)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  pts.forEach(p=>{
+    svg.innerHTML+=`<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#3d9970" stroke="#fff" stroke-width="2"/>`;
+    const ly=(p.y-pT>18)?p.y-9:p.y+17;
+    svg.innerHTML+=`<text x="${p.x}" y="${ly}" text-anchor="middle" fill="#3d9970" font-family="Arial" font-size="11" font-weight="bold">${p.s}</text>`;
+  });
+  const diff=scores[scores.length-1]-scores[0];
+  if(diff>0){note.textContent=`↗ Improved by ${diff} points since first session`;note.style.color='#3d9970';}
+  else if(diff<0){note.textContent=`↘ Down ${Math.abs(diff)} points — keep practicing!`;note.style.color='#e63946';}
+  else{note.textContent='→ Consistent performance';note.style.color='#4361ee';}
+}
+function renderCategoryChart(history){
+  const el=document.getElementById('category-bar-chart'),lb=document.getElementById('cat-labels');
+  el.innerHTML='';lb.innerHTML='';
+  if(history.length===0){el.innerHTML='<div style="color:#9999bb;font-size:13px;align-self:center;width:100%;text-align:center;">No data yet</div>';return;}
+  const maxH=130;
+  const cats=[
+    {key:'commScore',label:'Communication',bg:'#4361ee',border:'#4361ee'},
+    {key:'depthScore',label:'Depth/Clarity',bg:'#3d9970',border:'#3d9970'},
+    {key:'confScore',label:'Confidence',bg:'#9b59b6',border:'#9b59b6'},
+    {key:'totalScore',label:'Overall',bg:'#f4a261',border:'#e07830'}
+  ];
+  cats.forEach(cat=>{
+    const vals=history.map(h=>{const v=Number(h[cat.key]);return isNaN(v)?0:v;});
+    const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+    const barH=Math.max(6,Math.round((avg/100)*maxH));
+    const lt=maxH-barH-22;
+    const g=document.createElement('div');
+    g.style.cssText=`flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:${maxH}px;position:relative;`;
+    g.innerHTML=`<span style="font-size:13px;font-weight:800;color:${cat.border};position:absolute;top:${Math.max(0,lt)}px;left:50%;transform:translateX(-50%);white-space:nowrap;">${avg}</span>
+      <div style="width:44px;height:${barH}px;border-radius:7px 7px 0 0;background:${cat.bg};border:1.5px solid ${cat.border};border-bottom:none;box-shadow:0 2px 8px rgba(0,0,0,.1);"></div>`;
+    el.appendChild(g);
+    const lbl=document.createElement('div');
+    lbl.style.cssText=`flex:1;text-align:center;font-size:11px;font-weight:600;color:${cat.border};`;
+    lbl.textContent=cat.label;lb.appendChild(lbl);
+  });
+}
+function renderHistoryTable(history){
+  const wrap=document.getElementById('history-table-wrap');
+  if(history.length===0){wrap.innerHTML='<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">No interviews yet. Start your first session!</div></div>';return;}
+  const rows=[...history].reverse().map((h,i)=>{
+    const score=isNaN(Number(h.totalScore))?0:Number(h.totalScore);
+    const cls=score>=70?'high':score>=50?'mid':'low';
+    return `<tr><td><strong style="color:var(--text);">#${history.length-i}</strong></td>
+    <td><span class="badge ${h.type==='Technical'?'badge-blue':'badge-green'}">${h.type||'Interview'}</span></td>
+    <td>${h.questionsCount||'?'} Q / ${h.duration||'?'} min${h.answeredCount!=null?' ('+h.answeredCount+' answered)':''}</td>
+    <td><span class="sc-chip ${cls}">${score}/100</span></td>
+    <td style="font-size:12px;">${formatDate(h.date)}</td></tr>`;
+  }).join('');
+  wrap.innerHTML=`<table class="ht"><thead><tr><th>#</th><th>Type</th><th>Format</th><th>Score</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function clearHistory(){if(!confirm('Clear all history? Cannot be undone.'))return;saveHistory([]);renderAnalytics();showNotif('🗑️','History cleared.');}
+
+// ── LOGOUT ──
+function handleLogout(){
+  if(!confirm('Are you sure you want to log out?'))return;
+  localStorage.removeItem('is_user');showNotif('👋','Logged out!');
+  setTimeout(()=>location.reload(),700);
+}
+
+// ── EDIT MODAL ──
+function openEditModal(){
+  const user=getUser();if(!user)return;
+  document.getElementById('edit-name').value=user.name||'';
+  document.getElementById('edit-email').value=user.email||'';
+  document.getElementById('edit-edu').value=user.edu||'BTech';
+  document.getElementById('edit-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('edit-name').focus(),100);
+}
+function closeEditModal(){document.getElementById('edit-modal').classList.remove('open');document.body.style.overflow='';}
+function handleModalOverlayClick(e){if(e.target===document.getElementById('edit-modal'))closeEditModal();}
+function saveEditProfile(){
+  const name=document.getElementById('edit-name').value.trim();
+  const email=document.getElementById('edit-email').value.trim();
+  const edu=document.getElementById('edit-edu').value;
+  if(!name){showNotif('❗','Name cannot be empty.');return;}
+  if(!email||!email.includes('@')){showNotif('❗','Please enter a valid email.');return;}
+  if(!edu){showNotif('❗','Please select education level.');return;}
+  saveUser({...getUser(),name,email,edu});
+  closeEditModal();showNotif('✅','Profile updated!');
+  renderProfile();updateSidebarUser();
+}
+
+// ── UTILITIES ──
+function shuffleArray(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function formatDate(d){return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+function animateCount(id,from,to,dur){
+  const el=document.getElementById(id);if(!el)return;
+  const start=performance.now();
+  function step(now){const p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.round(from+(to-from)*e);if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+let notifT;
+function showNotif(icon,text){
+  const el=document.getElementById('notification');
+  document.getElementById('notifIcon').textContent=icon;
+  document.getElementById('notifText').textContent=text;
+  el.classList.add('show');clearTimeout(notifT);
+  notifT=setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeEditModal();
+  if(appState.currentPage==='interview'&&e.key==='Enter'&&e.ctrlKey)nextQuestion(false);
+});
+
+// ── INIT ──
+function init(){
+  const user=getUser();
+  if(user){updateSidebarUser();navigateApp('home');}
+  else navigate('landing');
+}
+init();
+</script>
+</body>
+</html>
